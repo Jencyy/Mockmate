@@ -1,9 +1,15 @@
-// models/User.js
-// This file defines the Mongoose schema (structure) for our User data in MongoDB.
+// =============================================================================
+// models/User.js — MongoDB User Schema
+// =============================================================================
+// Purpose : Defines the shape of a "User" document stored in MongoDB.
+// Used by : NextAuth callbacks (auth/[...nextauth]/route.js) to create/look up
+//           users, and by the evaluate API to associate interviews with users.
+// =============================================================================
 
 import mongoose, { Schema, models } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
-// Define the shape of a User document
+// ─── Schema Definition ────────────────────────────────────────────────────────
 const userSchema = new Schema(
   {
     name: {
@@ -13,22 +19,53 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true, // Ensures no two users can have the same email
+      unique: true,     // Prevents duplicate accounts with the same email
+      lowercase: true,  // Always store emails in lowercase for case-insensitive matching
+    },
+    password: {
+      type: String,
+      // Optional — only set for email/password sign-ups.
+      // OAuth users (Google/GitHub) do NOT have a password field.
+      select: false,    // Never return password in queries unless explicitly asked (.select('+password'))
     },
     image: {
-      type: String, // URL to the user's profile picture (from Google/GitHub)
+      type: String,     // Profile picture URL — from Google/GitHub, or auto-generated avatar
     },
-    // We do not need a password field here because we are using NextAuth with Google/GitHub
-    // which handles authentication via OAuth instead of passwords.
+    provider: {
+      type: String,
+      default: 'credentials', // 'credentials' | 'google' | 'github'
+    },
   },
   {
-    timestamps: true, // Automatically adds 'createdAt' and 'updatedAt' fields to the document
+    // Mongoose will automatically manage 'createdAt' and 'updatedAt' timestamps
+    timestamps: true,
   }
 );
 
-// In Next.js, models might be compiled multiple times during development.
-// We check if the 'User' model already exists in 'mongoose.models' to prevent "OverwriteModelError".
-// If it exists, we reuse it. Otherwise, we create a new model.
+// ─── Pre-Save Hook — Hash Password ───────────────────────────────────────────
+// Runs automatically BEFORE a user document is saved to MongoDB.
+// Only runs if the 'password' field was actually changed (avoids re-hashing on every update).
+userSchema.pre('save', async function (next) {
+  // 'this' refers to the document being saved
+  if (!this.isModified('password') || !this.password) return next();
+
+  // Hash the password with a salt factor of 12 (secure but not too slow)
+  // bcrypt generates a unique salt for each user automatically
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+// ─── Instance Method — Password Comparison ───────────────────────────────────
+// We add a reusable method to compare a plain-text password with the stored hash.
+// Usage: const isValid = await user.comparePassword('enteredPassword')
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  // bcrypt.compare() returns true if the hash matches, false otherwise
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// ─── Export ──────────────────────────────────────────────────────────────────
+// In Next.js hot-reload environments, 'mongoose.model()' can throw "OverwriteModelError"
+// if the model was already compiled. Checking 'models.User' first prevents this.
 const User = models.User || mongoose.model('User', userSchema);
 
 export default User;

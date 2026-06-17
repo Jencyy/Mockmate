@@ -30,12 +30,39 @@ const questionBank = {
     "Describe your typical debugging process when something breaks in production."
   ],
   "Database Admin": [
-    "What is the difference between INNER JOIN, LEFT JOIN, and RIGHT JOIN in SQL?",
+    "What is the difference INNER JOIN, LEFT JOIN, and RIGHT JOIN in SQL?",
     "How do you approach database backup and disaster recovery planning?",
     "What are database transactions and why are ACID properties important?",
     "Explain the difference between horizontal and vertical database scaling.",
     "How would you identify and fix a slow-running query?"
   ],
+  "Corporate Jargon": [
+    {
+      "word": "Bandwidth",
+      "meaning": "The capacity or time to take on more work.",
+      "usage": "Let's sync next week once I have more bandwidth to focus on this project."
+    },
+    {
+      "word": "Boil the ocean",
+      "meaning": "To attempt an impossible task or make a project unnecessarily scope-heavy.",
+      "usage": "We just need a simple proof of concept, let's not boil the ocean."
+    },
+    {
+      "word": "Circle back",
+      "meaning": "To discuss a topic again later or follow up on something at a future time.",
+      "usage": "I'll review the metrics and circle back with the team tomorrow morning."
+    },
+    {
+      "word": "Synergy",
+      "meaning": "The combined power of a group working together that is greater than their individual parts.",
+      "usage": "This partnership will create great synergy between our product teams."
+    },
+    {
+      "word": "Low-hanging fruit",
+      "meaning": "Tasks or goals that are easily achievable or require minimal effort.",
+      "usage": "Optimizing the image assets is low-hanging fruit for improving load speed."
+    }
+  ]
 };
 
 // Default questions used if the role doesn't match any key in the bank above
@@ -65,24 +92,42 @@ export async function POST(req) {
         const genAI = new GoogleGenerativeAI(geminiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
  
-        let specialInstructions = "Ensure the questions are highly practical, unpredictable, and assess deep understanding rather than just standard definitions.";
+        let prompt = "";
         
         if (role === "Corporate Jargon") {
-          specialInstructions = "DO NOT ask questions. Instead, just return a list of 5 common 'heavy' office words or corporate jargon terms along with their simple meanings. Format each item as 'Word: Meaning'. Example: 'Bandwidth: The capacity or time to take on more work.'";
-        } else if (role === "Learning & Explanations") {
-          specialInstructions = "The user is a beginner trying to learn. Frame the question as a learning exercise: provide a very simple, brief explanation of a concept first, and then ask a related easy question to test their understanding.";
+          prompt = `You are a corporate communications expert.
+          Generate exactly 5 common office words, business slang terms, or corporate jargon terms.
+          For each term, provide:
+          1. The corporate jargon term (word)
+          2. A simple, plain-English definition (meaning)
+          3. A realistic business example of how and where we can use this term (usage)
+          
+          Return the output STRICTLY as a JSON array of objects in this exact format, with no markdown code blocks:
+          [
+            {
+              "word": "Bandwidth",
+              "meaning": "The capacity or time to take on more work.",
+              "usage": "Let's sync next week once I have more bandwidth."
+            }
+          ]`;
         } else {
-          specialInstructions += " Make sure the language used is simple, clear, and realistic.";
-        }
+          let specialInstructions = "Ensure the questions are highly practical, unpredictable, and assess deep understanding rather than just standard definitions.";
+          
+          if (role === "Learning & Explanations") {
+            specialInstructions = "The user is a beginner trying to learn. Frame the question as a learning exercise: provide a very simple, brief explanation of a concept first, and then ask a related easy question to test their understanding.";
+          } else {
+            specialInstructions += " Make sure the language used is simple, clear, and realistic.";
+          }
 
-        const prompt = `You are an expert technical interviewer. 
-        Generate exactly 5 interview questions for a ${role} position. 
-        The category/topic is ${category} and the difficulty level should be ${difficulty}.
-        ${specialInstructions}
-        Generate unique questions every time so the user does not see the same questions repeatedly.
-        Keep the questions relatively concise to ensure fast generation times.
-        Return the output STRICTLY as a JSON array of strings with no other text or markdown.
-        Example format: ["Question 1?", "Question 2?", "Question 3?", "Question 4?", "Question 5?"]`;
+          prompt = `You are an expert technical interviewer. 
+          Generate exactly 5 interview questions for a ${role} position. 
+          The category/topic is ${category} and the difficulty level should be ${difficulty}.
+          ${specialInstructions}
+          Generate unique questions every time.
+          Keep the questions relatively concise to ensure fast generation times.
+          Return the output STRICTLY as a JSON array of strings with no other text or markdown.
+          Example format: ["Question 1?", "Question 2?", "Question 3?", "Question 4?", "Question 5?"]`;
+        }
 
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
