@@ -187,3 +187,4 @@ export const authOptions = {
 // Next.js App Router requires us to export named HTTP method handlers.
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
+  

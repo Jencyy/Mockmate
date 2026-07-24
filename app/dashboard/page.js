@@ -94,12 +94,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden transition-colors duration-300">
-      {/* Decorative gradient glowing mesh */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-[128px] pointer-events-none"></div>
-
       <div className="mb-10 relative z-10">
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight sm:text-4xl mb-2 transition-colors">
-          Welcome back, {session?.user?.name?.split(' ')[0] || 'Developer'}! 👋
+          Welcome back, {session?.user?.name?.split(' ')[0] || 'Developer'}!
         </h1>
         <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base transition-colors">
           Select a track below to start your AI mock interview or practice corporate communication vocabulary.
@@ -113,9 +110,8 @@ export default async function DashboardPage() {
           <p className="text-4xl font-extrabold text-foreground">{totalInterviews}</p>
         </div>
         <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-6 shadow-xl hover:border-gray-300 dark:hover:border-white/15 transition-all relative overflow-hidden group">
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-100 dark:bg-blue-500/10 rounded-full blur-xl pointer-events-none group-hover:scale-150 transition-transform"></div>
           <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-2">Average Score</p>
-          <p className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+          <p className="text-4xl font-extrabold text-blue-600 dark:text-blue-400">
             {averageScore} <span className="text-lg text-gray-400 dark:text-gray-500 font-medium">/10</span>
           </p>
         </div>
@@ -140,8 +136,6 @@ export default async function DashboardPage() {
                 key={role.id}
                 className="group relative p-6 rounded-2xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:shadow-2xl hover:-translate-y-1 hover:border-gray-300 dark:hover:bg-white/[0.08] dark:hover:border-white/20 transition-all overflow-hidden shadow-xl flex flex-col justify-between"
               >
-                {/* Decorative gradient blob that appears on hover */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-10 dark:group-hover:opacity-10 blur-2xl transition-all duration-500 pointer-events-none"></div>
                 
                 <div className="relative z-10 flex flex-col h-full">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 border ${role.border} ${role.bg} ${role.color}`}>

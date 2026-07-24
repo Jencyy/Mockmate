@@ -156,9 +156,20 @@ export default async function ResultsPage({ params }) {
                 </div>
               </div>
 
+              {q.correctAnswer && (
+                <div className="mb-6">
+                  <span className="text-[10px] text-blue-600 dark:text-blue-400 uppercase tracking-widest font-bold block mb-2 flex items-center gap-1.5 transition-colors">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Ideal Answer — What You Should Know
+                  </span>
+                  <div className="bg-blue-50 dark:bg-blue-500/10 rounded-xl p-4 text-blue-900 dark:text-blue-100 border border-blue-200 dark:border-blue-500/20 leading-relaxed text-sm whitespace-pre-line transition-colors">
+                    {q.correctAnswer}
+                  </div>
+                </div>
+              )}
+
               <div>
                 <span className="text-[10px] text-purple-600 dark:text-purple-400 uppercase tracking-widest font-bold block mb-2 flex items-center gap-1.5 transition-colors">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> AI feedback evaluation
+                  <CheckCircle2 className="w-3.5 h-3.5" /> AI Feedback
                 </span>
                 <div className="bg-purple-50 dark:bg-purple-950/20 rounded-xl p-4 text-purple-900 dark:text-purple-100 border border-purple-200 dark:border-purple-500/20 leading-relaxed text-sm transition-colors">
                   {q.aiFeedback}

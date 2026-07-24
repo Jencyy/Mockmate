@@ -38,9 +38,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg group-hover:scale-105 transition-transform">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
+            {/* The user will put their logo here */}
             <span className="font-bold text-xl tracking-tight text-gray-900 dark:text-white transition-colors">MockMate AI</span>
           </Link>
 

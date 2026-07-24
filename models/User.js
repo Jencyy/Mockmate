@@ -45,14 +45,14 @@ const userSchema = new Schema(
 // ─── Pre-Save Hook — Hash Password ───────────────────────────────────────────
 // Runs automatically BEFORE a user document is saved to MongoDB.
 // Only runs if the 'password' field was actually changed (avoids re-hashing on every update).
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
   // 'this' refers to the document being saved
-  if (!this.isModified('password') || !this.password) return next();
+  // In Mongoose v9, async pre-hooks don't receive `next` — Mongoose awaits the returned promise automatically
+  if (!this.isModified('password') || !this.password) return;
 
   // Hash the password with a salt factor of 12 (secure but not too slow)
   // bcrypt generates a unique salt for each user automatically
   this.password = await bcrypt.hash(this.password, 12);
-  next();
 });
 
 // ─── Instance Method — Password Comparison ───────────────────────────────────

@@ -10,6 +10,9 @@
 // =============================================================================
 
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 import {
   ArrowRight,
   BrainCircuit,
@@ -27,16 +30,16 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+  
+  // Redirect logged-in users to the dashboard automatically
+  if (session) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="flex-1 flex flex-col bg-background overflow-hidden relative transition-colors duration-300">
-
-      {/* ── Ambient Background Glow ────────────────────────────────────────── */}
-      {/* These are blurred, low-opacity gradient circles that create a premium */}
-      {/* "glow mesh" effect seen in modern SaaS products like Linear & Vercel */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-blue-600/20 to-indigo-600/10 rounded-full blur-[130px] -z-10 pointer-events-none"></div>
-      <div className="absolute top-10 right-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-purple-600/20 to-pink-600/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
-      <div className="absolute bottom-1/2 left-0 w-[300px] h-[300px] bg-indigo-600/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
 
       {/* ══════════════════════════════════════════════════════════════════════ */}
       {/* SECTION 1: HERO                                                      */}
@@ -54,7 +57,7 @@ export default function Home() {
           {/* Main headline */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground mb-8 leading-[1.15] transition-colors duration-300">
             Master your next{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-500">
+            <span className="text-blue-600 dark:text-blue-500">
               interview
             </span>
             <br className="hidden sm:block" /> with AI-powered practice
@@ -255,7 +258,7 @@ export default function Home() {
                 avatar: "AK",
                 color: "from-green-500 to-teal-500",
                 stars: 5,
-                quote: "The Corporate Jargon mode helped me feel comfortable in standup meetings. I finally understand what 'boil the ocean' means 😂",
+                quote: "The Corporate Jargon mode helped me feel comfortable in standup meetings. I finally understand what 'boil the ocean' means.",
               },
             ].map(({ name, role, avatar, color, stars, quote }) => (
               <div key={name} className="p-7 rounded-2xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:shadow-2xl hover:border-gray-300 dark:hover:border-white/20 transition-all shadow-md">

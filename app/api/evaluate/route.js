@@ -50,16 +50,16 @@ export async function POST(req) {
     if (geminiKey) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // We build a clear, structured prompt so the AI returns consistent JSON
-        const prompt = `You are an expert, strict, and highly analytical technical interviewer evaluating a candidate for a ${role} position.
+        const prompt = `You are an expert, and highly analytical technical interviewer evaluating a candidate for a ${role} position.
         The category/topic is ${category} and the difficulty level is ${difficulty}.
         
 Here are the interview questions and the candidate's answers:
 ${JSON.stringify(questions, null, 2)}
 
-Evaluate each answer HONESTLY and strictly. Do not give high scores for generic or shallow answers. Provide:
+Evaluate each answer HONESTLY . Do not give high scores for generic or shallow answers. Provide:
 - A score out of 10. (Be highly critical. Reserve 9-10 for exceptional answers, 7-8 for good, 5-6 for average, and below 5 for poor).
 - Detailed, constructive, and brutal feedback pointing out exactly what was missing or incorrect.
 
@@ -89,10 +89,11 @@ Return ONLY a valid JSON object (no markdown, no extra text) in this exact forma
       evaluationData = generateFallbackEvaluation(questions);
     }
 
-    // --- Step 2: Combine questions with AI feedback ---
+    // --- Step 2: Combine questions with AI feedback + correct answers ---
     const finalQuestions = questions.map((q, i) => ({
       questionText: q.questionText,
       userAnswer: q.userAnswer,
+      correctAnswer: q.correctAnswer || "",
       aiScore: evaluationData.evaluations[i]?.aiScore || 5,
       aiFeedback: evaluationData.evaluations[i]?.aiFeedback || "No feedback available.",
     }));

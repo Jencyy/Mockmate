@@ -24,32 +24,24 @@ import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  // useTheme() gives us the current theme string and a setter function
-  const { theme, setTheme } = useTheme();
-
-  // 'mounted' prevents hydration mismatch (see comment block above)
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // useEffect runs only on the client, never on the server.
-  // When this fires, we know we're safely on the client and can show the icon.
   useEffect(() => {
     setMounted(true);
-  }, []); // Empty dependency array = runs once when component first mounts
+  }, []);
 
-  // Before client mount, return a placeholder of the same size to avoid layout shift
   if (!mounted) {
     return <div className="w-9 h-9" />;
   }
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       className="p-2 rounded-lg bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 transition-colors"
       aria-label="Toggle theme"
     >
-      {/* Show Sun when in dark mode (clicking will switch to light) */}
-      {/* Show Moon when in light mode (clicking will switch to dark) */}
-      {theme === "dark" ? (
+      {resolvedTheme === "dark" ? (
         <Sun className="w-5 h-5 text-gray-300 hover:text-white transition-colors" />
       ) : (
         <Moon className="w-5 h-5 text-gray-700 hover:text-black transition-colors" />
